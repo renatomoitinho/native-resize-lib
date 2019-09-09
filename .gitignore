@@ -1,0 +1,7 @@
+*/target
+./target
+*.lock
+.DS_Store
+.idea/
+*.class
+*.h
