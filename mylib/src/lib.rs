@@ -1,3 +1,5 @@
+pub mod commons;
+
 // This is the interface to the JVM that we'll
 // call the majority of our methods on.
 use jni::JNIEnv;
@@ -49,6 +51,8 @@ pub extern "system" fn Java_HelloWorld_helloByte(
 ) -> jbyteArray {
     // First, we have to get the byte[] out of java.
     let _input = env.convert_byte_array(input).unwrap();
+
+    let buffer: Vec<u8> = env.convert_byte_array(input).unwrap();
 
     // Then we have to create a new java byte[] to return.
     let buf = [1; 2000];
@@ -127,6 +131,21 @@ pub unsafe extern "system" fn Java_HelloWorld_counterDestroy(
 ) {
     let _boxed_counter = Box::from_raw(counter_ptr as *mut Counter);
 }
+
+
+//JNIEXPORT jlong JNICALL Java_HelloWorld_createImageReference
+//(JNIEnv *, jclass, jbyteArray, jobject);
+#[no_mangle]
+pub unsafe extern "system" fn Java_HelloWorld_createImageReference(
+    _env: JNIEnv,
+    _class: JClass,
+    input: jbyteArray,
+    callback: JObject) -> jlong {
+
+    commons::boxes::create_new_reference(_env, input, callback)
+}
+
+
 
 #[no_mangle]
 pub extern "system" fn Java_HelloWorld_asyncComputation(

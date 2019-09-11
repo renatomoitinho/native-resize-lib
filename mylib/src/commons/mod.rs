@@ -1,6 +1,11 @@
 pub mod image;
+pub mod boxes;
 
+use jni::JNIEnv;
+use jni::objects::{GlobalRef, JValue};
 use openssl::hash::{Hasher, MessageDigest};
+use jni::sys::{jbyteArray, jint, jlong, jstring};
+
 use opencv::core;
 
 #[derive(Debug, Clone, Copy)]
@@ -9,6 +14,41 @@ pub struct ImageResize {
     pub height: i32,
     pub vertical_border: i32,
     pub horizontal_border: i32
+}
+
+pub struct ImageRef {
+    pub mat: core::Mat,
+    pub size: i64,
+    pub width: i32,
+    pub height: i32,
+    callback: Option<GlobalRef>
+}
+
+impl ImageRef {
+    pub fn new (buffer: Vec<u8>, global_ref: Option<GlobalRef>) -> ImageRef {
+
+        let img_size = buffer.len() as i64;
+        let mat_src = image::load_buffer(&buffer).unwrap();
+        let (real_height, real_width ) = (mat_src.rows().unwrap(), mat_src.cols().unwrap());
+
+        ImageRef {
+            mat: mat_src,
+            size: img_size,
+            width: real_width,
+            height: real_height,
+            callback: global_ref
+        }
+    }
+
+    pub fn augment(&mut self, env: JNIEnv) {
+
+        let gl = self.callback.as_ref();
+
+        env.call_method(gl.unwrap().as_obj(), "setWidth", "(I)V", &[self.width.into()], ).unwrap();
+        env.call_method(gl.unwrap().as_obj(), "setHeight", "(I)V", &[self.height.into()], ).unwrap();
+        env.call_method(gl.unwrap().as_obj(), "setSize", "(I)V", &[self.size.into()], ).unwrap();
+
+    }
 }
 
 pub fn get_hash(buffer: &[u8]) -> String {

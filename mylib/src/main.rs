@@ -4,35 +4,6 @@ use std::time;
 use std::env;
 use opencv::core;
 
-#[derive(Debug)]
-struct ImageRef {
-    mat: core::Mat,
-    size: i64,
-    hash: String,
-    width: i32,
-    height: i32,
-}
-impl ImageRef {
-    pub fn new (buffer: Vec<u8>) -> ImageRef {
-
-        let img_size = buffer.len() as i64;
-        let start_1 = time::Instant::now();
-        let hash_md5 = commons::get_hash(buffer.as_slice());
-        println!("time to generate MD5 => {:?}", start_1.elapsed() );
-
-        let mat_src = commons::image::load_buffer(&buffer).unwrap();
-        let (real_height, real_width ) = (mat_src.rows().unwrap(), mat_src.cols().unwrap());
-
-        ImageRef {
-            mat: mat_src,
-            size: img_size,
-            hash: hash_md5,
-            width: real_width,
-            height: real_height,
-        }
-    }
-}
-
 fn get_size_rez(img_resize: commons::ImageResize) -> core::Size {
     core::Size {
         width: img_resize.width,
@@ -40,7 +11,7 @@ fn get_size_rez(img_resize: commons::ImageResize) -> core::Size {
     }
 }
 
-fn get_size_ref(img_ref: &ImageRef) -> core::Size {
+fn get_size_ref(img_ref: &commons::ImageRef) -> core::Size {
     core::Size {
         width: img_ref.width,
         height: img_ref.height
@@ -68,11 +39,11 @@ fn main() {
 
     // load image from buffer
     let start_2 = time::Instant::now();
-    let img_ref = ImageRef::new(buffer);
+    let img_ref = commons::ImageRef::new(buffer, None);
     println!("time to load image from buffer => {:?}", start_2.elapsed());
 
     // target new size
-    let img_resize = commons::get_target_size(get_size_ref(&img_ref), 1000, 1000);
+    let img_resize = commons::get_target_size(get_size_ref(&img_ref), 1024, 1024);
 
     // resize
     let start_3 = time::Instant::now();
@@ -87,7 +58,7 @@ fn main() {
     // write in disk
     let start_5 = time::Instant::now();
 
-    commons::image::write_on_disc(new_img, "/tmp/UUU.jpeg", 80, "JPG");
+    commons::image::write_on_disc(new_img, "/tmp/media_test.jpeg", 100, "JPG");
     // buffer = get_mat_as_buffer(new_img).unwrap();
     println!("time to write image => {:?}", start_5.elapsed());
     // println!("time to write image => {:?} {:?}", start_5.elapsed() , buffer.len() );
