@@ -58,9 +58,9 @@ fn main() {
     // write in disk
     let start_5 = time::Instant::now();
 
-    commons::image::write_on_disc(new_img, "/tmp/media_test.jpeg", 100, "JPG");
-    // buffer = get_mat_as_buffer(new_img).unwrap();
-    println!("time to write image => {:?}", start_5.elapsed());
-    // println!("time to write image => {:?} {:?}", start_5.elapsed() , buffer.len() );
+    //commons::image::write_on_disc(new_img, "/tmp/media_test.jpeg", 100, "JPG");
+     buffer = commons::image::get_buffer(new_img, 100, "JPG").unwrap(); //get_mat_as_buffer(new_img).unwrap();
+    //println!("time to write image => {:?}", start_5.elapsed());
+     println!("time to write image => {:?} {:?}", start_5.elapsed() , buffer.len() );
     println!("time total => {:?}", start_1.elapsed());
 }

@@ -96,7 +96,7 @@ impl Counter {
             "(I)V",
             &[self.count.into()],
         )
-        .unwrap();
+            .unwrap();
     }
 }
 
@@ -141,12 +141,43 @@ pub unsafe extern "system" fn Java_HelloWorld_createImageReference(
     _class: JClass,
     input: jbyteArray,
     callback: JObject) -> jlong {
-
     commons::boxes::create_new_reference(_env, input, callback)
 }
 
+#[no_mangle]
+pub unsafe extern "system" fn Java_HelloWorld_destroyReference(
+    _env: JNIEnv,
+    _class: JClass,
+    reference_id: jlong,
+) {
+    commons::boxes::destroy_reference(reference_id)
+}
 
+#[no_mangle]
+pub unsafe extern "system" fn Java_HelloWorld_resize(
+    _env: JNIEnv,
+    _class: JClass,
+    reference_id: jlong,
+    width: jint,
+    height: jint,
+    quality: jint,
+    format: JString
+) -> jbyteArray {
 
+    let input: String = _env
+        .get_string(format)
+        .expect("Couldn't get java string!")
+        .into();
+
+    let buffer = commons::boxes::box_resize(reference_id, width as i32, height as i32, quality as i32, &input ).unwrap();
+    let output = _env.byte_array_from_slice(&buffer).unwrap();
+
+    output
+}
+//int width, int height, int quality, String format
+
+//JNIEXPORT jbyteArray JNICALL Java_HelloWorld_resize
+//(JNIEnv *, jclass, jint, jint, jint, jstring);
 #[no_mangle]
 pub extern "system" fn Java_HelloWorld_asyncComputation(
     env: JNIEnv,

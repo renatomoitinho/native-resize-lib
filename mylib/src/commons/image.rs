@@ -8,6 +8,13 @@ use opencv::prelude::Vector;
 
 const WHITE_COLOR: f64 = 255 as f64;
 
+pub fn get_size(_width: i32, _height: i32) -> core::Size {
+    core::Size {
+        width: _width,
+        height: _height,
+    }
+}
+
 pub fn default_white_scalar() -> core::Scalar {
     core::Scalar::new(WHITE_COLOR, WHITE_COLOR, WHITE_COLOR, WHITE_COLOR)
 }
@@ -57,7 +64,8 @@ pub fn read_image_direct_mat(image: &str) -> Result<core::Mat, opencv::Error> {
 pub fn get_buffer(src: core::Mat, q: i32, format: &str) -> Result<Vec<u8>, opencv::Error> {
     let quality = get_format(format, q);
     let mut rs_buf = VectorOfuchar::new();
-    imgcodecs::imencode(format!(".{:?}", format.to_lowercase()).as_str(), &src, &mut rs_buf, &quality)
+
+    imgcodecs::imencode(format!(".{}", format.to_lowercase()).as_str(), &src, &mut rs_buf, &quality)
         .expect("create a buffer image failed");
 
     Ok(rs_buf.to_vec())
@@ -69,14 +77,14 @@ pub fn write_on_disc(src: core::Mat, path: &str, q: i32, format: &str) {
         .expect("");
 }
 
-pub fn get_format(format: &str, q: i32) ->  VectorOfint {
+pub fn get_format(format: &str, q: i32) -> VectorOfint {
     let mut quality = VectorOfint::with_capacity(2);
     match format {
-        "JPG" | "JPEG"  => {
+        "JPG" | "JPEG" => {
             quality.push(q);
             quality.push(imgcodecs::IMWRITE_JPEG_QUALITY);
         }
-        "PNG"  => {
+        "PNG" => {
             quality.push(q);
             quality.push(imgcodecs::IMWRITE_PNG_COMPRESSION);
         }

@@ -7,30 +7,32 @@ class HelloWorld {
     private static native String hello(String input);
     private static native byte[] helloByte(byte[] input);
     private static native void factAndCallMeBack(int n, HelloWorld callback);
-
     private static native long counterNew(HelloWorld callback);
     private static native void counterIncrement(long counter_ptr);
+    private static native void asyncComputation(HelloWorld callback);
     private static native void counterDestroy(long counter_ptr);
 
     // images
 
     private static native long createImageReference(byte[] input, HelloWorld callback);
 
-    private static native void asyncComputation(HelloWorld callback);
-
     static {
         System.loadLibrary("mylib");
     }
 
+    public HelloWorld() {
+    }
+
+    public HelloWorld(byte[] bytes) {
+        setReferenceObject(createImageReference(bytes, this));
+    }
+
     public static void main(String[] args) throws IOException {
 
-        byte[] bytes = Files.readAllBytes(Paths.get("/home/renato/Documents/repositories/rust/imgs/carro.jpg"));
+        byte[] bytes = Files.readAllBytes(Paths.get("/Users/renatomoitinho/Documents/repositories/rust-lang/imgs/10mb.jpg"));
 
-        HelloWorld imageRef = new HelloWorld();
+        HelloWorld imageRef = new HelloWorld(bytes);
 
-        long image_reference = createImageReference(bytes, imageRef);
-
-        System.out.println("image code=> " + image_reference);
         System.out.println("image => " + imageRef.toString() );
 
         String[] names = {
