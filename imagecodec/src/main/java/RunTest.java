@@ -1,9 +1,13 @@
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * @author renato.dias
@@ -12,31 +16,58 @@ public class RunTest {
 
     public static void main(String[] args) throws IOException {
 
-        String[] images = {
+        Path pathJpeg = getOptionalPath(args).orElse(Paths.get("/tmp"));
 
-        };
+        if(!(Files.exists(pathJpeg) && Files.isDirectory(pathJpeg))) {
+            throw new IllegalArgumentException("Directories images not found");
+        }
 
+        File[] images  = Stream.of(pathJpeg.toFile().listFiles(File::isFile)).toArray(File[]::new);
 
+        for(File img : images) {
 
-        byte[] bytes = Files.readAllBytes(Paths.get("/home/renato/Documents/repositories/rust/imgs/media440.jpeg"));
+            if(!img.getName().matches("^.*(jpe?g|png)$")) continue;
 
-        OutputStream out = Files.newOutputStream(Paths.get("/home/renato/Documents/repositories/rust/imgs/out.jpeg"));
+            String newName = UUID.randomUUID().toString() + "__"+img.getName();
+            Path out = img.toPath().getParent().resolve(newName);
+
+            resize_perform(img.toPath(), out);
+        }
+    }
+
+    private static void resize_perform(Path in, Path out) throws IOException {
+
+        byte[] bytes = Files.readAllBytes(in);
+        OutputStream fout = new FileOutputStream(out.toFile());
 
         Instant start = Instant.now();
 
         HelloWorld hello = new HelloWorld(bytes);
 
-        System.out.println("elapsed load buffer => " + ChronoUnit.MILLIS.between(start, Instant.now()) + " ms");
+        println("elapsed load buffer => %s [%sms]" , in.toFile().getName(), ChronoUnit.MILLIS.between(start, Instant.now()));
 
         start = Instant.now();
 
         bytes = hello.scale(1024, 1024, 80, ImageCodec.IMG_FORMAT.JPEG);
 
-        System.out.println("elapsed scale buffer => " + ChronoUnit.MILLIS.between(start, Instant.now()) + " ms");
+        println("elapsed scale buffer => %s [%sms]", in.toFile().getName() , ChronoUnit.MILLIS.between(start, Instant.now()) );
 
-        out.write(bytes);
-
-        out.close();
+        fout.write(bytes);
+        fout.close();
         hello.close();
     }
+
+    private static Optional<Path> getOptionalPath(String[] args) {
+
+        if(args.length == 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Paths.get(args[0]));
+    }
+
+    private static void println(String message, String name, long time) {
+        System.out.println(String.format(message, name, time));
+    }
+
 }

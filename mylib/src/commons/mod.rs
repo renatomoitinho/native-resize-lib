@@ -2,10 +2,8 @@ pub mod image;
 pub mod boxes;
 
 use jni::JNIEnv;
-use jni::objects::{GlobalRef, JValue};
+use jni::objects::{GlobalRef};
 use openssl::hash::{Hasher, MessageDigest};
-use jni::sys::{jbyteArray, jint, jlong, jstring};
-
 use opencv::core;
 
 #[derive(Debug, Clone, Copy)]
@@ -39,7 +37,7 @@ impl ImageRef {
 
     pub fn update_mat(&mut self, src: &core::Mat) {
         let mut result = core::Mat::default().unwrap();
-        src.copy_to(&mut result);
+        src.copy_to(&mut result).unwrap();
         self.mat = Some(result);
         self.update_size();
     }

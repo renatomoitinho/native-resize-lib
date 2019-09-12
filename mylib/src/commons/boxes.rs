@@ -5,7 +5,7 @@ use crate::commons::get_target_size;
 use opencv::core;
 
 use jni::JNIEnv;
-use jni::objects::{GlobalRef, JObject};
+use jni::objects::{JObject};
 use jni::sys::{jbyteArray, jlong};
 
 pub fn get_size_ref(img_ref: &ImageRef) -> core::Size {
@@ -32,7 +32,7 @@ pub fn create_new_reference(env: &JNIEnv, input: jbyteArray, obj: JObject) -> jl
 }
 
 pub unsafe fn box_resize(env: &JNIEnv, reference_id: jlong, width: i32, height: i32, quality: i32, format: &str) -> Result<Vec<u8>, opencv::Error> {
-    let mut image_ref = &mut *(reference_id as *mut ImageRef);
+    let image_ref = &mut *(reference_id as *mut ImageRef);
     let img_size = get_target_size(get_size_ref(image_ref), width, height);
     let result= resize( image_ref.mat.as_ref().unwrap(), get_size_rez(img_size) ).unwrap();
 
@@ -43,7 +43,7 @@ pub unsafe fn box_resize(env: &JNIEnv, reference_id: jlong, width: i32, height: 
 }
 
 pub unsafe fn box_scale(env: &JNIEnv, reference_id: jlong, width: i32, height: i32, quality: i32, format: &str) -> Result<Vec<u8>, opencv::Error> {
-    let mut image_ref = &mut *(reference_id as *mut ImageRef);
+    let image_ref = &mut *(reference_id as *mut ImageRef);
     let img_size = get_target_size(get_size_ref(image_ref), width, height);
     let mut result= resize( image_ref.mat.as_ref().unwrap(), get_size_rez(img_size) ).unwrap();
 
@@ -56,5 +56,5 @@ pub unsafe fn box_scale(env: &JNIEnv, reference_id: jlong, width: i32, height: i
 }
 
 pub unsafe fn destroy_reference(reference_id: jlong) {
-    let image_ref = Box::from_raw(reference_id as *mut ImageRef);
+    let _image_ref = Box::from_raw(reference_id as *mut ImageRef);
 }

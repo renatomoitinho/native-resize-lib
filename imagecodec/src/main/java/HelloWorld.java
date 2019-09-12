@@ -59,7 +59,6 @@ class HelloWorld implements ImageCodec, Closeable {
         this.referenceObject = referenceObject;
     }
 
-
     @Override
     public byte[] resize(int width, int height, int quality, IMG_FORMAT img_format) {
         byte[] bytes = resize(this.referenceObject, width, height, quality, img_format.name());

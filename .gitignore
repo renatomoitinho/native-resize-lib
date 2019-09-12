@@ -7,3 +7,7 @@
 *.h
 .history/
 imagecodec/image.codec.iml
+.vscode/
+imagecodec/.classpath
+imagecodec/.project
+imagecodec/.settings/

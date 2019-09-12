@@ -1,10 +1,11 @@
-java_run: lib
-	javac HelloWorld.java && java -Djava.library.path=mylib/target/debug/ HelloWorld
 
 .PHONY: lib
 
-javah:
-	javah HelloWorld
+java_exec: java_run
+	java -jar -Djava.library.path=mylib/target/debug/ imagecodec/target/image.codec-1.0.jar $(DIR)
+
+java_run: lib
+	cd imagecodec && mvn clean install package
 
 lib:
 	cd mylib && cargo build
