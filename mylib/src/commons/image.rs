@@ -19,18 +19,18 @@ pub fn default_white_scalar() -> core::Scalar {
     core::Scalar::new(WHITE_COLOR, WHITE_COLOR, WHITE_COLOR, WHITE_COLOR)
 }
 
-pub fn expand(src: core::Mat, resize: ImageResize) -> Result<core::Mat, opencv::Error> {
+pub fn expand(src: &core::Mat, resize: ImageResize) -> Result<core::Mat, opencv::Error> {
     let mut result = core::Mat::default()?;
 
-    core::copy_make_border(&src, &mut result, resize.vertical_border, resize.vertical_border,
+    core::copy_make_border(src, &mut result, resize.vertical_border, resize.vertical_border,
                            resize.horizontal_border, resize.horizontal_border, core::BORDER_CONSTANT,
                            default_white_scalar()).expect("not load buffer");
     Ok(result)
 }
 
-pub fn resize(img_ref: core::Mat, size: core::Size) -> Result<core::Mat, opencv::Error> {
+pub fn resize(img_ref: &core::Mat, size: core::Size) -> Result<core::Mat, opencv::Error> {
     let mut result = core::Mat::default()?;
-    let img: &core::Mat = &img_ref;
+    let img: &core::Mat = img_ref;
 
     imgproc::resize(
         img,
@@ -61,11 +61,11 @@ pub fn read_image_direct_mat(image: &str) -> Result<core::Mat, opencv::Error> {
     Ok(mat)
 }
 
-pub fn get_buffer(src: core::Mat, q: i32, format: &str) -> Result<Vec<u8>, opencv::Error> {
+pub fn get_buffer(src: &core::Mat, q: i32, format: &str) -> Result<Vec<u8>, opencv::Error> {
     let quality = get_format(format, q);
     let mut rs_buf = VectorOfuchar::new();
 
-    imgcodecs::imencode(format!(".{}", format.to_lowercase()).as_str(), &src, &mut rs_buf, &quality)
+    imgcodecs::imencode(format!(".{}", format.to_lowercase()).as_str(), src, &mut rs_buf, &quality)
         .expect("create a buffer image failed");
 
     Ok(rs_buf.to_vec())

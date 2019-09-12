@@ -17,8 +17,7 @@ pub struct ImageResize {
 }
 
 pub struct ImageRef {
-    pub mat: core::Mat,
-    pub size: i64,
+    pub mat: Option<core::Mat>,
     pub width: i32,
     pub height: i32,
     callback: Option<GlobalRef>
@@ -27,27 +26,38 @@ pub struct ImageRef {
 impl ImageRef {
     pub fn new (buffer: Vec<u8>, global_ref: Option<GlobalRef>) -> ImageRef {
 
-        let img_size = buffer.len() as i64;
         let mat_src = image::load_buffer(&buffer).unwrap();
         let (real_height, real_width ) = (mat_src.rows().unwrap(), mat_src.cols().unwrap());
 
         ImageRef {
-            mat: mat_src,
-            size: img_size,
+            mat: Some(mat_src),
             width: real_width,
             height: real_height,
             callback: global_ref
         }
     }
 
-    pub fn augment(&mut self, env: JNIEnv) {
+    pub fn update_mat(&mut self, src: &core::Mat) {
+        let mut result = core::Mat::default().unwrap();
+        src.copy_to(&mut result);
+        self.mat = Some(result);
+        self.update_size();
+    }
+
+    fn update_size(&mut self) {
+
+        let src = self.mat.as_ref().unwrap();
+
+        self.width = src.cols().unwrap();
+        self.height = src.rows().unwrap();
+    }
+
+    pub fn call_reference(&mut self, env: &JNIEnv) {
 
         let gl = self.callback.as_ref();
 
         env.call_method(gl.unwrap().as_obj(), "setWidth", "(I)V", &[self.width.into()], ).unwrap();
         env.call_method(gl.unwrap().as_obj(), "setHeight", "(I)V", &[self.height.into()], ).unwrap();
-        env.call_method(gl.unwrap().as_obj(), "setSize", "(I)V", &[self.size.into()], ).unwrap();
-
     }
 }
 
