@@ -1,3 +1,5 @@
+package image;
+
 public interface ImageCodec {
     enum IMG_FORMAT {
         JPEG, JPG, PNG

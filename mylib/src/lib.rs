@@ -14,10 +14,10 @@ use jni::objects::{JClass, JObject, JString};
 // lifetime checker won't let us.
 use jni::sys::{jbyteArray, jint, jlong};
 
-//JNIEXPORT jlong JNICALL Java_HelloWorld_createImageReference
+//JNIEXPORT jlong JNICALL Java_image_HelloWorld_createImageReference
 //(JNIEnv *, jclass, jbyteArray, jobject);
 #[no_mangle]
-pub unsafe extern "system" fn Java_HelloWorld_createImageReference(
+pub unsafe extern "system" fn Java_image_HelloWorld_createImageReference(
     _env: JNIEnv,
     _class: JClass,
     input: jbyteArray,
@@ -26,7 +26,7 @@ pub unsafe extern "system" fn Java_HelloWorld_createImageReference(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_HelloWorld_destroyReference(
+pub unsafe extern "system" fn Java_image_HelloWorld_destroyReference(
     _env: JNIEnv,
     _class: JClass,
     reference_id: jlong,
@@ -35,7 +35,7 @@ pub unsafe extern "system" fn Java_HelloWorld_destroyReference(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_HelloWorld_resize(
+pub unsafe extern "system" fn Java_image_HelloWorld_resize(
     _env: JNIEnv,
     _class: JClass,
     reference_id: jlong,
@@ -56,7 +56,7 @@ pub unsafe extern "system" fn Java_HelloWorld_resize(
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn Java_HelloWorld_scale(
+pub unsafe extern "system" fn Java_image_HelloWorld_scale(
     env: JNIEnv,
     _class: JClass,
     reference_id: jlong,

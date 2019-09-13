@@ -1,10 +1,8 @@
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+package image;
 
-class HelloWorld implements ImageCodec, Closeable {
+import java.io.Closeable;
+
+public class HelloWorld implements ImageCodec, Closeable {
 
     private static native long createImageReference(byte[] input, HelloWorld callback);
 
